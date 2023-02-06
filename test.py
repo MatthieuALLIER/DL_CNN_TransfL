@@ -60,17 +60,16 @@ train.classes #Donc 0 représente les damage et 1 les no_damage
 
 #Chargement en DataLoader avec batch 128 pour éviter les crashs en entrainement et shuffle
 #pour mélanger les batchs à chaque étape de l'entrainement
-train_dl = DataLoader(train, 128, shuffle = True, num_workers = 4, pin_memory = True)
+train_dl = DataLoader(train, 64, shuffle = True, num_workers = 0, pin_memory = True)
 
-val_dl = DataLoader(validation, 128*2, num_workers = 4, pin_memory = True)
+val_dl = DataLoader(validation, 64*2, num_workers = 4, pin_memory = True)
 
-num_epochs = 50
+num_epochs = 30
 opt_func = torch.optim.RMSprop
-lr = 1e-4
+lr = 1e-3
 
 model = CNN.NaturalSceneClassification()
 history = CNN.fit(num_epochs, lr, model, train_dl, val_dl, opt_func)
-
 
 
 

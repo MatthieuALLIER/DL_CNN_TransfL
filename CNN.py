@@ -68,7 +68,7 @@ class NaturalSceneClassification(ImageClassificationBase):
             nn.Flatten(),
             nn.Linear(128*7*7, 512),
             nn.ReLU(),
-            nn.Linear(512, 1),
+            nn.Linear(512, 2),
             nn.Sigmoid()
         )
     
