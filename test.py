@@ -14,7 +14,8 @@ from torchvision.datasets import ImageFolder
 
 import os
 
-import CNN
+from Medium_CNN import MediumCNN, MediumFit
+from DC_CNN import CNNet, fit_CNN, val_CNN
 
 #Sous dossier des données images
 train_dir = './train_another'
@@ -60,20 +61,26 @@ train.classes #Donc 0 représente les damage et 1 les no_damage
 
 #Chargement en DataLoader avec batch 128 pour éviter les crashs en entrainement et shuffle
 #pour mélanger les batchs à chaque étape de l'entrainement
-train_dl = DataLoader(train, 64, shuffle = True, num_workers = 0, pin_memory = True)
+train_dl = DataLoader(train, 20, shuffle = True, num_workers = 4, pin_memory = True)
 
-val_dl = DataLoader(validation, 64*2, num_workers = 4, pin_memory = True)
+val_dl = DataLoader(validation, 20, shuffle = True, num_workers = 4, pin_memory = True)
 
-num_epochs = 30
+num_epochs = 10
 opt_func = torch.optim.RMSprop
-lr = 1e-3
+lr = 1e-4
+model = MediumCNN()
+history, model = MediumFit(num_epochs, lr, model, train_dl, val_dl, opt_func)
 
-model = CNN.NaturalSceneClassification()
-history = CNN.fit(num_epochs, lr, model, train_dl, val_dl, opt_func)
+from torchinfo import summary
 
+summary(model)
 
-
-
+#DataCamp
+net = CNNet()
+criterion = torch.nn.CrossEntropyLoss()
+optimizer = torch.optim.RMSprop(net.parameters(), lr=1e-4)
+fit_CNN(net, train_dl, criterion, optimizer)
+val_CNN(net, val_dl)
 
 
 
