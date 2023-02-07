@@ -3,6 +3,8 @@
 Created on Mon Feb  6 15:56:05 2023
 
 @author: mallier
+
+Méthode medium.com
 """
 import torch
 import torch.nn as nn
@@ -44,7 +46,7 @@ class ImageClassificationBase(nn.Module):
 
 
 #Model de l'article en pytorch avec comme base la classe de suivi des modèles
-class NaturalSceneClassification(ImageClassificationBase):
+class MediumCNN(ImageClassificationBase):
     def __init__(self):
         super().__init__()
         self.network = nn.Sequential(
@@ -79,12 +81,19 @@ class NaturalSceneClassification(ImageClassificationBase):
 @torch.no_grad()
 def evaluate(model, val_loader):
     model.eval()
-    outputs = [model.validation_step(batch) for batch in val_loader]
+    outputs = []
+    step = 0
+    for batch in val_loader:
+        outputs.append(model.validation_step(batch))
+        step += 1
+        if step == 50:
+            break
+        
     return model.validation_epoch_end(outputs)
 
 
 #Fonction d'entrainement sur le dataloader train avec epoch
-def fit(epochs, lr, model, train_loader, val_loader, opt_func = torch.optim.SGD):
+def MediumFit(epochs, lr, model, train_loader, val_loader, opt_func = torch.optim.SGD):
     
     history = []
     optimizer = opt_func(model.parameters(),lr)
@@ -92,16 +101,20 @@ def fit(epochs, lr, model, train_loader, val_loader, opt_func = torch.optim.SGD)
         
         model.train()
         train_losses = []
-        for batch in train_loader:
+        step = 0
+        for batch in train_loader: 
             loss = model.training_step(batch)
             train_losses.append(loss)
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()
+            step += 1
+            if step == 100:
+                break
             
         result = evaluate(model, val_loader)
         result['train_loss'] = torch.stack(train_losses).mean().item()
         model.epoch_end(epoch, result)
         history.append(result)
     
-    return history
+    return history, model
